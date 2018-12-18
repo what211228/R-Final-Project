@@ -1,0 +1,52 @@
+1052 DataMining Exercise I (Analyzing Taxi Data)
+
+Analyzing the NYC taxi dataset to answer the following questions.
+(Download sites: http://deal1.iecs.fcu.edu.tw/dm1052_exercise1.zip)
+	
+Questions
+É‹	Q1: What are the most pickups and drop offs region?
+ÉÂ		hint: use one of cluster algorithms and count number of data points of each cluster.
+	Q2: What is the best time to take taxi? 
+ÉÂ		hint: count number of pickups in different hour.
+Éﬁ	Q3: Whether weather affects customers to take taxi or not? Explain how.
+Éﬁ	Q4: Does long distance trip imply more tip?
+
+Requirements (for each group):
+	(1) A report answering the questions above with plots for exaplanation. The reports must also include how the data are processed and why they are processed this way.
+	(2) A 10-minute presentation to brief your results.
+	(3) Besides the questions above, the results cover the following additional requirements would gain extra grades for the exercise.
+		a. Tell whether there's any differences between the analyses made by the sampled and the complete dataset.
+		b. Tell whether there's any differences between analyses made for June and July.
+			hint: package data.table can be good for loading large data set
+			hint: if you can not load the complete data set into your machine once, try to separate it into several small pieces, do your analysis on each piece of the dataset, and then merge the results together.
+		c. Besides the weather data offered in the package, tell whether any other weather factors may influence how customers take taxi.
+		d.Anything else worth mentioning (e.g. other valuable ovservations)
+
+Contents in dm1052_exercise1.zip:
+	sample.csv 
+		sampled yellow taxi records in New York City during June, 2015.
+		p.s 123,249 records in total.
+	humidity.txt
+		the daily average humidity in New York City during June, 2015.
+	precipitation.txt
+		the daily sum of precipitation (rain drops) in New York City during June, 2015.
+		p.s T means precipitation has been detected, but it isn't sufficient to measure meaningfully.
+	temperature.txt
+		the daily average temperature in New York City during June, 2015.
+	data_dictionary_trip_records_yellow.pdf
+		the data schema explanation for the sampled data.
+	README
+		this document.
+
+How to get the original data set
+	Local download point for the complete yellow taxi records in NYC during June and July, 2015
+		http://deal1.iecs.fcu.edu.tw/yellow_tripdata_201506-07.zip
+	Taxi Data Source
+		http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
+	Taxi Data Schema
+		http://www.nyc.gov/html/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+	Weather Data Source:
+		https://www.wunderground.com/history/airport/KNYC/2015/6/1/CustomHistory.html?dayend=30&monthend=6&yearend=2015&req_city=&req_state=&req_statename=&reqdb.zip=&reqdb.magic=&reqdb.wmo=&MR=1
+		hint: this url is for the weather data between June 1st to June 30th, 2015. 
+	Reference
+		http://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/

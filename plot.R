@@ -9,11 +9,11 @@ View(addweatherdata)
 #1.試分析在紐約市不同區域以及不同時間點的上下車趨勢，並查找紐約市相關資料，提出影響計程車載客多寡趨勢的原因。
 
 #每小時載客量
-ggplot(addweatherdata, aes(x=pickup_hour,color=I("White"),fill=I("steelblue")))+
+ggplot(addweatherdata, aes(x=pickup_hour,color=I("White"),fill=I("")))+
     geom_histogram(bins=24)
 
 #每天載客
-ggplot(addweatherdata, aes(x=pickup_day,color=I("White"),fill=I("springgreen4")))+
+ggplot(addweatherdata, aes(x=pickup_day,color=I("White"),fill=I("darkorchid3")))+
     geom_histogram(bins=30)
 
 
@@ -34,14 +34,19 @@ ggmap(map)+
 
 #下雨天載客
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
-    geom_histogram(aes(fill=precipitation>0.00))
+    geom_histogram(aes(fill=precipitation>0.00))+
+    scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否雨天")
+
+
 
 #溫度載客
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
+    scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否舒適溫度")+
     geom_histogram(aes(fill=temperature<20))
 
 #濕度載客 30~60
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
+    scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否舒適濕度")+
     geom_histogram(aes(fill= 30<=precipitation&&precipitation<=60))
 
 
@@ -51,7 +56,7 @@ ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
 #小費分佈圖已去除=0
 filter(addweatherdata,tip_amount!=0)%>%
     ggplot()+
-    geom_density(aes(x=tip_amount))+
+    geom_density(aes(x=tip_amount,color=I("brown3")))+
     xlim(0,25)+
     geom_vline(aes(xintercept=mean(tip_amount)),
                 color="blue", linetype="dashed", size=1)
@@ -61,6 +66,7 @@ filter(addweatherdata,tip_amount!=0)%>%
     ggplot()+
     geom_density(aes(x=tip_amount,color=passenger_count>mean(passenger_count)))+
     xlim(0,25)+
+    scale_color_manual(values = c("firebrick2", "deepskyblue2"),name="是否大於平均乘客數")+
     geom_vline(aes(xintercept=mean(tip_amount)),
                 color="blue", linetype="dashed", size=1)
 
@@ -69,6 +75,7 @@ filter(addweatherdata,tip_amount!=0)%>%
     ggplot()+
     geom_density(aes(x=tip_amount,color=dropoff_hour==c(0,1,2,3,4,5)))+
     xlim(0,25)+
+    scale_color_manual(values = c("firebrick2", "deepskyblue2"),name="是否開夜車")+
     geom_vline(aes(xintercept=mean(tip_amount)),
                 color="blue", linetype="dashed", size=1)
 
@@ -88,6 +95,7 @@ filter(addweatherdata,tip_amount!=0)%>%
     ggplot()+
     geom_density(aes(x=tip_amount,color=trip_distance>mean(trip_distance)))+
     xlim(0,25)+
+    scale_color_manual(values = c("firebrick2", "deepskyblue2"),name="是否大於平均旅程")+
     geom_vline(aes(xintercept=mean(tip_amount)),
                 color="blue", linetype="dashed", size=1)
 
@@ -103,7 +111,10 @@ h <-group_by(addweatherdata,pickup_hour)%>%
 names(h)<-c("hour","tip_avg")
 
 
-ggplot(h,aes(x=hour,y=tip_avg))+
+group_by(addweatherdata,pickup_hour)%>%View
+    summarise(mean(tip_amount, na.rm = TRUE))%>%
+
+ggplot(h,aes(x=hour,y=tip_avg,color=I("brown3")))+
     geom_line()+
     geom_point()
 
@@ -113,7 +124,7 @@ j<-group_by(addweatherdata,pickup_hour)%>%
     summarise(mean(trip_distance, na.rm = TRUE))
 names(j)<-c("hour","trip_distance_avg")
 
-ggplot(j,aes(x=hour,y=trip_distance_avg))+
+ggplot(j,aes(x=hour,y=trip_distance_avg,color=I("brown3")))+
     geom_line()+
     geom_point()
 
@@ -121,6 +132,27 @@ ggplot(j,aes(x=hour,y=trip_distance_avg))+
 #小費/距離
 k<- left_join(h,j)
 k<-mutate(k,perMileTip=tip_avg/trip_distance_avg)
-ggplot(k,aes(x=hour,y=perMileTip))+
+ggplot(k,aes(x=hour,y=perMileTip,,color=I("brown3")))+
     geom_line()+
     geom_point()
+
+
+ggplot(addweatherdata)+
+geom_density(aes(x=trip_distance,color=I("springgreen4")))
+
+
+paysum <- data.frame(
+  group = c("信用卡", "現金", "免費","協議","未知"),
+  value = c(nrow(filter(addweatherdata,payment_type==1)),
+            nrow(filter(addweatherdata,payment_type==2)),
+            nrow(filter(addweatherdata,payment_type==3)),
+            nrow(filter(addweatherdata,payment_type==4)),
+            nrow(filter(addweatherdata,payment_type==5)))
+  )
+nrow(filter(addweatherdata,payment_type==1))
+nrow(filter(addweatherdata,payment_type==2))
+nrow(filter(addweatherdata,payment_type==3))
+
+ggplot(paysum, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+
+# coord_polar("y", start=0)

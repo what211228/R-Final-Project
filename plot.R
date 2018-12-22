@@ -1,6 +1,11 @@
+install.packages("devtools")
+devtools::install_github("dgrtwo/gganimate")
 library(ggplot2, help, pos = 2, lib.loc = NULL)
 library(dplyr, help, pos = 2, lib.loc = NULL)
 library(ggmap, help, pos = 2, lib.loc = NULL)
+library(gganimate)
+install.packages("gifski")
+
 
 addweatherdata<- read.csv("cleandata.csv",header = T,sep = ",")
 map <- readRDS("nycmap10.rds")
@@ -25,11 +30,15 @@ ggmap(map)+
 dev.off()
 
 ggmap(map)+
-    geom_point(data=filter(addweatherdata,pickup_hour==8),aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
-        ggtitle(8)
-   
+    geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
+    # labs(title ='Pickup hour {frame_time}', x = 'longitude', y = 'latitude')+
+    transition_manual(pickup_hour)
 
-
+ggmap(map)+
+    geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
+    labs(title ='Dropoff hour {frame_time}', x = 'longitude', y = 'latitude')+
+    transition_time(dropoff_hour)
+    
 #2.試分析天氣因素如何影響紐約市黃牌計程車的載客量，並提出可能的解釋。
 
 #下雨天載客

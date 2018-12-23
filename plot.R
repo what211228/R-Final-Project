@@ -1,14 +1,15 @@
 install.packages("devtools")
+install.packages("gifski")
 devtools::install_github("dgrtwo/gganimate")
 library(ggplot2, help, pos = 2, lib.loc = NULL)
 library(dplyr, help, pos = 2, lib.loc = NULL)
 library(ggmap, help, pos = 2, lib.loc = NULL)
 library(gganimate)
-install.packages("gifski")
+
 
 
 addweatherdata<- read.csv("cleandata.csv",header = T,sep = ",")
-map <- readRDS("nycmap10.rds")
+map <- readRDS("nycmap12.rds")
 View(addweatherdata)
 
 #1.試分析在紐約市不同區域以及不同時間點的上下車趨勢，並查找紐約市相關資料，提出影響計程車載客多寡趨勢的原因。
@@ -23,16 +24,23 @@ ggplot(addweatherdata, aes(x=pickup_day,color=I("White"),fill=I("darkorchid3")))
 
 
 ####ggmap尚未分析####
-png(paste0(i,".png"), width=600, height=600)
 ggmap(map)+
     geom_point(data=filter(addweatherdata,dropoff_hour==8),aes(x = dropoff_longitude,y = dropoff_latitude), alpha = 0.5, color = "red")+
     ggtitle(8)
-dev.off()
+
+ggplot()+
+    geom_segment(data=addweatherdata, aes(x=dropoff_longitude, y=dropoff_latitude, xend=pickup_longitude, yend=pickup_latitude), 
+     arrow=arrow(),alpha = 0.5)+
+    geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")
+
+ggmap(map)+
+    geom_segment(data=addweatherdata, aes(x=dropoff_longitude, y=dropoff_latitude, xend=pickup_longitude, yend=pickup_latitude), 
+     arrow=arrow(),alpha = 0.5)
 
 ggmap(map)+
     geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
-    # labs(title ='Pickup hour {frame_time}', x = 'longitude', y = 'latitude')+
-    transition_manual(pickup_hour)
+    labs(title ='Pickup hour {frame_time}', x = 'longitude', y = 'latitude')+
+    transition_time(pickup_hour)
 
 ggmap(map)+
     geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
@@ -164,4 +172,23 @@ nrow(filter(addweatherdata,payment_type==3))
 
 ggplot(paysum, aes(x="", y=value, fill=group))+
 geom_bar(width = 1, stat = "identity")+
-# coord_polar("y", start=0)
+coord_polar("y", start=0)
+
+
+distinct(select(addweatherdata,tolls_amount))
+
+
+filter(addweatherdata,tolls_amount!=0)%>%
+    ggplot()+
+    geom_density(aes(x=tolls_amount,color=trip_distance>mean(trip_distance)))+
+    xlim(0,10)+
+    scale_color_manual(values = c("firebrick2", "deepskyblue2"),name="是否大於平均旅程")+
+    geom_vline(aes(xintercept=mean(tolls_amount)),
+                color="blue", linetype="dashed", size=1)
+
+filter(addweatherdata,tolls_amount!=0)%>%
+    ggplot()+
+    geom_density(aes(x=tolls_amount,color=I("brown3")))+
+    xlim(0,10)+
+    geom_vline(aes(xintercept=mean(tolls_amount)),
+                color="blue", linetype="dashed", size=1)

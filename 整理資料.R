@@ -43,7 +43,7 @@ cleandata <- mutate(data,pickup_day = as.integer(substring(tpep_pickup_datetime,
 
 addweatherdata <- left_join(x=cleandata,y=weather,by="pickup_day")
 
-# View(addweatherdata)
+View(addweatherdata)
 
 
 write.table(addweatherdata, file = "cleandata.csv", sep = ",")

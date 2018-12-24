@@ -6,8 +6,6 @@ library(dplyr, help, pos = 2, lib.loc = NULL)
 library(ggmap, help, pos = 2, lib.loc = NULL)
 library(gganimate)
 
-
-
 addweatherdata<- read.csv("cleandata.csv",header = T,sep = ",")
 map <- readRDS("nycmap12.rds")
 View(addweatherdata)
@@ -22,21 +20,12 @@ ggplot(addweatherdata, aes(x=pickup_hour,color=I("White"),fill=I("")))+
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White"),fill=I("darkorchid3")))+
     geom_histogram(bins=30)
 
-
-####ggmap尚未分析####
-ggmap(map)+
-    geom_point(data=filter(addweatherdata,dropoff_hour==8),aes(x = dropoff_longitude,y = dropoff_latitude), alpha = 0.5, color = "red")+
-    ggtitle(8)
-
-ggplot()+
-    geom_segment(data=addweatherdata, aes(x=dropoff_longitude, y=dropoff_latitude, xend=pickup_longitude, yend=pickup_latitude), 
-     arrow=arrow(),alpha = 0.5)+
-    geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")
-
+#From to
 ggmap(map)+
     geom_segment(data=addweatherdata, aes(x=dropoff_longitude, y=dropoff_latitude, xend=pickup_longitude, yend=pickup_latitude), 
      arrow=arrow(),alpha = 0.5)
 
+#動圖
 ggmap(map)+
     geom_point(data=addweatherdata,aes(x = pickup_longitude,y = pickup_latitude), alpha = 0.5, color = "red")+
     labs(title ='Pickup hour {frame_time}', x = 'longitude', y = 'latitude')+
@@ -54,8 +43,6 @@ ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
     geom_histogram(aes(fill=precipitation>0.00))+
     scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否雨天")
 
-
-
 #溫度載客
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
     scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否舒適溫度")+
@@ -65,7 +52,6 @@ ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
 ggplot(addweatherdata, aes(x=pickup_day,color=I("White")))+
     scale_fill_manual(values = c("tomato", "deepskyblue2"),name="是否舒適濕度")+
     geom_histogram(aes(fill= 30<=precipitation&&precipitation<=60))
-
 
 
 #(3) 試分析紐約的黃牌計程車司機如何可以獲得最多的小費 (tip)
@@ -157,7 +143,7 @@ ggplot(k,aes(x=hour,y=perMileTip,,color=I("brown3")))+
 ggplot(addweatherdata)+
 geom_density(aes(x=trip_distance,color=I("springgreen4")))
 
-
+#付費比例（先求有，尚未求好版）
 paysum <- data.frame(
   group = c("信用卡", "現金", "免費","協議","未知"),
   value = c(nrow(filter(addweatherdata,payment_type==1)),
@@ -175,20 +161,16 @@ geom_bar(width = 1, stat = "identity")+
 coord_polar("y", start=0)
 
 
-distinct(select(addweatherdata,tolls_amount))
+#4.信用卡/現金
 
+#距離
+ggplot()+
+    geom_density(data=filter(addweatherdata,payment_type==1),aes(x=trip_distance,color=I("red")))+
+    geom_density(data=filter(addweatherdata,payment_type==2),aes(x=trip_distance,color=I("blue")))+
+    xlim(0,25)
 
-filter(addweatherdata,tolls_amount!=0)%>%
-    ggplot()+
-    geom_density(aes(x=tolls_amount,color=trip_distance>mean(trip_distance)))+
-    xlim(0,10)+
-    scale_color_manual(values = c("firebrick2", "deepskyblue2"),name="是否大於平均旅程")+
-    geom_vline(aes(xintercept=mean(tolls_amount)),
-                color="blue", linetype="dashed", size=1)
-
-filter(addweatherdata,tolls_amount!=0)%>%
-    ggplot()+
-    geom_density(aes(x=tolls_amount,color=I("brown3")))+
-    xlim(0,10)+
-    geom_vline(aes(xintercept=mean(tolls_amount)),
-                color="blue", linetype="dashed", size=1)
+#總花費
+ggplot()+
+    geom_density(data=filter(addweatherdata,payment_type==1),aes(x=total_amount,color=I("red")))+
+    geom_density(data=filter(addweatherdata,payment_type==2),aes(x=total_amount,color=I("blue")))+
+    xlim(0,100)
